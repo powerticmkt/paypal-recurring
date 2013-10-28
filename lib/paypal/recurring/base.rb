@@ -2,6 +2,7 @@ module PayPal
   module Recurring
     class Base
       attr_accessor :amount
+      attr_accessor :billing_cycles
       attr_accessor :cancel_url
       attr_accessor :currency
       attr_accessor :description
@@ -189,6 +190,7 @@ module PayPal
           :frequency,
           :period,
           :email,
+          :billing_cycles,
           :trial_length,
           :trial_period,
           :trial_frequency,
