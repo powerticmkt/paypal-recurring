@@ -146,6 +146,7 @@ module PayPal
         @client ||= begin
           Net::HTTP.new(uri.host, uri.port).tap do |http|
             http.use_ssl = true
+            http.ssl_version = :TLSv1
             http.verify_mode = OpenSSL::SSL::VERIFY_PEER
             http.ca_file = CA_FILE
           end
