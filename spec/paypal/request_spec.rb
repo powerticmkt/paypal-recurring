@@ -6,6 +6,10 @@ describe PayPal::Recurring::Request do
       subject.client.use_ssl?.should be_true
     end
 
+    it "uses TLSv1_2" do
+      subject.client.ssl_version.should == :TLSv1_2
+    end
+
     it "verifies certificate" do
       subject.client.verify_mode.should == OpenSSL::SSL::VERIFY_PEER
     end

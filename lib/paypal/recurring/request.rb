@@ -52,6 +52,7 @@ module PayPal
       ATTRIBUTES = {
         :action                => "ACTION",
         :amount                => ["PAYMENTREQUEST_0_AMT", "AMT"],
+        :billing_cycles        => "TOTALBILLINGCYCLES",
         :billing_type          => "L_BILLINGTYPE0",
         :cancel_url            => "CANCELURL",
         :currency              => ["PAYMENTREQUEST_0_CURRENCYCODE", "CURRENCYCODE"],
@@ -145,6 +146,7 @@ module PayPal
         @client ||= begin
           Net::HTTP.new(uri.host, uri.port).tap do |http|
             http.use_ssl = true
+            http.ssl_version = :TLSv1_2
             http.verify_mode = OpenSSL::SSL::VERIFY_PEER
             http.ca_file = CA_FILE
           end
