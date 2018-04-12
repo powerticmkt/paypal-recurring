@@ -1,10 +1,10 @@
 = PayPal Recurring Billing
 
-PayPal Express Checkout API Client for recurring billing.
+PayPal Express Checkout API Client for recurring billing. A modified version based on fnando/paypal-recurring
 
 == Installation
 
-  gem install paypal-recurring
+  In your Gemfile, add gem 'paypal-recurring', :git => git://github.com/fredxinfan/paypal-recurring.git
 
 == Usage
 
@@ -13,10 +13,21 @@ First, you need to set up your credentials:
   require "paypal/recurring"
 
   PayPal::Recurring.configure do |config|
-    config.sandbox = true
+    # config.sandbox = true
     config.username = "seller_1308793919_biz_api1.simplesideias.com.br"
     config.password = "1308793931"
+    config.application_id = "APP-YOURAPPIDHERE"
     config.signature = "AFcWxV21C7fd0v3bYYYRCpSSRl31AzaB6TzXx5amObyEghjU13.0av2Y"
+  end
+
+If you are using paypal certificate:
+  
+  PayPal::Recurring.configure do |config|
+    # config.sandbox = true
+    config.username = "seller_1308793919_biz_api1.simplesideias.com.br"
+    config.password = "1308793931"
+    config.application_id = "APP-YOURAPPIDHERE"
+    config.ssl_cert = "/path/to/cert_key_pem.txt"
   end
 
 Then, you can request a new payment authorization:
@@ -29,6 +40,20 @@ Then, you can request a new payment authorization:
     :amount       => "9.00",
     :currency     => "USD"
   })
+
+If you request a payment on behalf of a third party:
+
+  ppr = PayPal::Recurring.new({
+    :return_url   => "http://example.com/paypal/thank_you",
+    :cancel_url   => "http://example.com/paypal/canceled",
+    :ipn_url      => "http://example.com/paypal/ipn",
+    :description  => "Awesome - Monthly Subscription",
+    :amount       => "9.00",
+    :subject      => "thirdparty@emailaddress.com",
+    :currency     => "USD"
+  })
+	
+You also need to add "X-PAYPAL-AUTHORIZATION" header in your third party API call. Generate "X-PAYPAL-AUTHORIZATION" header by using this gem https://github.com/fx83060856/paypal-permissions.git
 
   response = ppr.checkout
   puts response.checkout_url if response.valid?

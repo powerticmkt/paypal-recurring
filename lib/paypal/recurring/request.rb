@@ -89,6 +89,7 @@ module PayPal
         :trial_length          => "TRIALTOTALBILLINGCYCLES",
         :trial_period          => "TRIALBILLINGPERIOD",
         :username              => "USER",
+        :subject               => "SUBJECT",
         :version               => "VERSION"
       }
 
@@ -120,6 +121,13 @@ module PayPal
       def request
         @request ||= Net::HTTP::Post.new(uri.request_uri).tap do |http|
           http["User-Agent"] = "PayPal::Recurring/#{PayPal::Recurring::Version::STRING}"
+          http["X-PAYPAL-SECURITY-USERID"] = PayPal::Recurring.username
+          http["X-PAYPAL-SECURITY-PASSWORD"] = PayPal::Recurring.password
+          http["X-PAYPAL-APPLICATION-ID"] = PayPal::Recurring.application_id
+          http["X-PAYPAL-SECURITY-SIGNATURE"] = PayPal::Recurring.signature
+          http["X-PAYPAL-AUTHORIZATION"] = PayPal::Recurring.authorization
+          http['X-PAYPAL-REQUEST-DATA-FORMAT'] = 'NV'
+          http['X-PAYPAL-RESPONSE-DATA-FORMAT'] = 'NV'
         end
       end
 
@@ -149,6 +157,11 @@ module PayPal
             http.ssl_version = :TLSv1_2
             http.verify_mode = OpenSSL::SSL::VERIFY_PEER
             http.ca_file = CA_FILE
+            if PayPal::Recurring.ssl_cert
+              cert = File.read(PayPal::Recurring.ssl_cert)
+              http.cert = OpenSSL::X509::Certificate.new(cert)
+              http.key = OpenSSL::PKey::RSA.new(cert)
+            end
           end
         end
       end
@@ -157,7 +170,9 @@ module PayPal
         {
           :username    => PayPal::Recurring.username,
           :password    => PayPal::Recurring.password,
+          :application_id => PayPal::Recurring.application_id,
           :signature   => PayPal::Recurring.signature,
+          :ssl_cert    => PayPal::Recurring.ssl_cert,
           :version     => PayPal::Recurring.api_version
         }
       end
